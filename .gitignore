@@ -1,0 +1,13 @@
+# 작업 중 파일 — 배포본에 섞이면 안 되는 것들
+_chk.js
+_scratch/
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# 원자료(교과서 PDF·출제용 hwp 등)는 공개 저장소에 올리지 않습니다.
+_src/
+
+# 평문 원본 — 커밋 금지 (bank.enc 만 배포)
+content.js

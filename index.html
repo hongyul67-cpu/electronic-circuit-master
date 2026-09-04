@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>전자회로 마스터</title>
+<meta name="description" content="디지털 논리 회로 Ⅰ~Ⅶ단원 배우기 · 게이트 게임 · 종합시험">
+<!-- 수업용 「모두 같은 문제」 — 다른 공용 스크립트보다 먼저 -->
+<script src="https://hongyul67-cpu.github.io/links/fixorder.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --line:#e2e5ea; --tx:#1c2430; --dim:#6b7684;
+  --pri:#2563eb; --ok:#12a150; --no:#e5484d; --warn:#f5a524; --pu:#7c3aed;
+  --g1:#bfdbfe; --g2:#bbf7d0; --g3:#fde68a; --g4:#fecdd3; --g5:#ddd6fe;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);
+     font:15px/1.65 "Pretendard","맑은 고딕",system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px 14px 96px}
+button{font-family:inherit}
+[hidden]{display:none!important}
+
+header{display:flex;align-items:baseline;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0;font-weight:800}
+header .sub{color:var(--dim);font-size:13px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);
+     cursor:pointer;font-weight:700;font-size:14px;color:var(--dim)}
+.tab.on{background:var(--pri);border-color:var(--pri);color:#fff}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+      padding:16px 18px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:16px}
+.card .body{color:#333}
+.card .body p{margin:8px 0}
+.kw{background:#eef4ff;color:#1d4ed8;border-radius:6px;padding:1px 6px;font-weight:700}
+.tip{background:#f0f9f4;border-left:3px solid var(--ok);border-radius:0 8px 8px 0;padding:9px 12px}
+.warn{background:#fff7ed;border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:9px 12px}
+
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;
+     padding:10px 16px;font-weight:700;cursor:pointer;font-size:14px;color:var(--tx)}
+.btn-primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn-ghost{background:#f2f5fa}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.pill{display:inline-block;background:#eef1f5;border-radius:99px;padding:2px 10px;
+      font-size:12px;font-weight:700;color:var(--dim)}
+.muted{color:var(--dim);font-size:13px}
+.score{font-size:34px;font-weight:900;letter-spacing:-1px}
+.empty{color:var(--dim);text-align:center;padding:34px 10px}
+
+/* 표 — 개념·문항 공용. 좁은 화면에서는 옆으로 밀어 봅니다. */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
+table.tb{border-collapse:collapse;font-size:13.5px;min-width:0}
+table.tb th,table.tb td{border:1px solid var(--line);padding:5px 9px;text-align:center;vertical-align:middle}
+table.tb th{background:#f4f6fa;font-weight:700;white-space:nowrap}
+table.tb td{background:#fff}
+table.tb td:not(:empty){white-space:normal}
+table.tb.qt{margin:10px 0}
+
+/* 게이트 기호 */
+.gates{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.gates figure{margin:0;width:96px;text-align:center}
+.gates figcaption{font-size:12px;font-weight:700;color:var(--dim);margin-top:-2px}
+svg.gs{width:90px;height:50px;display:block}
+/* 게이트 기호의 색·굵기는 <defs> 안 도형에 속성으로 직접 박습니다.
+   <use> 는 그림자 DOM 으로 복제되므로 여기서 쓴 선택자(.bd/.ln)가 닿지 않습니다.
+   처음에 CSS 로만 두었더니 게이트가 전부 검게 칠해진 덩어리로 나왔습니다. */
+
+/* 문제 */
+.qnum{color:var(--dim);font-size:13px;font-weight:700}
+.qtext{font-size:17px;font-weight:700;margin:6px 0 12px;line-height:1.55}
+.qtext .qbox{font-weight:600;font-size:15px;background:#f7f9fc;border:1px solid var(--line);
+             border-radius:10px;padding:10px 12px;margin:8px 0}
+.choice{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);
+        border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-size:15px;color:var(--tx)}
+.choice:hover{border-color:var(--pri)}
+.choice.correct{border-color:var(--ok);background:#eafaf1}
+.choice.wrong{border-color:var(--no);background:#fdeeee}
+.choice.picked{border-width:2px}
+.explain{background:#f8fafc;border-left:3px solid var(--pri);border-radius:0 8px 8px 0;
+         padding:10px 14px;margin-top:10px;color:#334}
+.progress{height:8px;background:#e8ebf0;border-radius:99px;overflow:hidden;margin:10px 0 16px}
+.progress > i{display:block;height:100%;background:var(--pri);width:0;transition:width .25s}
+
+/* 배우기 단원 칩 */
+.units{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.unit{padding:8px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card);
+      cursor:pointer;font-weight:700;font-size:13.5px;color:var(--dim)}
+.unit.on{background:var(--pu);border-color:var(--pu);color:#fff}
+.srcline{font-size:12px;color:var(--dim);margin-top:10px}
+
+/* 게임 */
+.gmenu{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;
+       cursor:pointer;text-align:left}
+.gcard:hover{border-color:var(--pri)}
+.gcard b{display:block;font-size:15.5px;margin-bottom:4px}
+.gcard span{font-size:13px;color:var(--dim)}
+
+table.grid{border-collapse:collapse;font-size:15px}
+table.grid th,table.grid td{border:1px solid var(--line);padding:6px 10px;text-align:center;min-width:38px}
+table.grid th{background:#f4f6fa;font-weight:700}
+/* 누르는 칸 — 진짜 <button> 을 넣습니다. <td> 에 onclick 만 달면
+   키보드로 못 누르고, 겹침 검사기도 잡지 못합니다. */
+td.ycell{padding:0;background:#fbfdff;min-width:52px}
+td.ycell button{width:100%;min-height:36px;border:0;background:transparent;
+      font:inherit;font-size:15px;font-weight:900;cursor:pointer;color:var(--tx);padding:6px 10px}
+td.ycell button:hover{background:#eef4ff}
+td.vcell{font-weight:900;min-width:52px}
+td.ycell.ok,td.vcell.ok{background:#eafaf1;color:var(--ok)}
+td.ycell.bad,td.vcell.bad{background:#fdeeee;color:var(--no)}
+td.ycell.ok button{color:var(--ok)}
+td.ycell.bad button{color:var(--no)}
+.expr{font-size:19px;font-weight:800;letter-spacing:.3px;margin:4px 0 12px}
+
+.nodes{display:grid;gap:8px}
+/* 게임 — 보기 버튼과 기호·파형 그림 */
+.gopts{display:flex;flex-direction:column;gap:2px}
+.gopts .btn{font-size:15.5px;padding:13px 14px;line-height:1.45}
+.btn.correct{border-color:var(--ok);background:#eafaf1;color:var(--ok);font-weight:800}
+.btn.wrong{border-color:var(--no);background:#fdeeee;color:var(--no);font-weight:800}
+.btn:disabled{cursor:default;opacity:1}
+.gsym svg, .gwave svg{max-width:100%;height:auto}
+
+/* 잠금 화면 */
+#lock{position:fixed;inset:0;background:var(--bg);z-index:9000;display:flex;
+      align-items:center;justify-content:center;padding:20px}
+#lock .box{background:var(--card);border:1px solid var(--line);border-radius:16px;
+      padding:26px 22px;max-width:420px;width:100%;text-align:center}
+#lock h2{margin:0 0 6px;font-size:19px}
+#lock p{margin:6px 0 14px;font-size:13.5px;color:var(--dim)}
+#lock input{width:100%;font:inherit;font-size:17px;text-align:center;letter-spacing:2px;
+      padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+#lockMsg{min-height:22px;font-size:13.5px;font-weight:700;color:var(--dim)}
+
+@media (max-width:520px){
+  .wrap{padding:12px 11px 96px}
+  .qtext{font-size:16px}
+  .gates figure{width:84px}
+  svg.gs{width:78px;height:44px}
+}
+</style>
+</head>
+<body data-build="96176911">
+
+<!-- 게이트 기호 — 직접 그린 SVG (외부 이미지는 언젠가 깨집니다) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="g-and" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M22 8 H44 A17 17 0 0 1 44 42 H22 Z" fill="#fff"/>
+    <path d="M6 17 H22 M6 33 H22 M61 25 H84"/>
+  </g>
+  <g id="g-or" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M20 8 Q37 25 20 42 Q48 42 62 25 Q48 8 20 8 Z" fill="#fff"/>
+    <path d="M8 17 H27 M8 33 H27 M62 25 H84"/>
+  </g>
+  <g id="g-nand" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18 8 H38 A17 17 0 0 1 38 42 H18 Z" fill="#fff"/>
+    <circle cx="60" cy="25" r="5" fill="#fff"/>
+    <path d="M4 17 H18 M4 33 H18 M65 25 H84"/>
+  </g>
+  <g id="g-nor" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M16 8 Q33 25 16 42 Q44 42 56 25 Q44 8 16 8 Z" fill="#fff"/>
+    <circle cx="62" cy="25" r="5" fill="#fff"/>
+    <path d="M4 17 H23 M4 33 H23 M67 25 H84"/>
+  </g>
+  <g id="g-not" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24 8 L54 25 L24 42 Z" fill="#fff"/>
+    <circle cx="60" cy="25" r="5" fill="#fff"/>
+    <path d="M6 25 H24 M65 25 H84"/>
+  </g>
+  <g id="g-buf" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M26 8 L58 25 L26 42 Z" fill="#fff"/>
+    <path d="M6 25 H26 M58 25 H84"/>
+  </g>
+  <g id="g-xor" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M22 8 Q39 25 22 42 Q50 42 64 25 Q50 8 22 8 Z" fill="#fff"/>
+    <path d="M13 8 Q30 25 13 42"/>
+    <path d="M4 17 H20 M4 33 H20 M64 25 H84"/>
+  </g>
+  <g id="g-xnor" fill="none" stroke="#1c2430" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18 8 Q35 25 18 42 Q46 42 58 25 Q46 8 18 8 Z" fill="#fff"/>
+    <path d="M9 8 Q26 25 9 42"/>
+    <circle cx="64" cy="25" r="5" fill="#fff"/>
+    <path d="M2 17 H16 M2 33 H16 M69 25 H84"/>
+  </g>
+</defs></svg>
+
+<div id="lock">
+  <div class="box">
+    <div style="font-size:38px;line-height:1">🔌</div>
+    <h2>전자회로 마스터</h2>
+    <p>교과서를 정리한 자료가 들어 있어 <b>코드를 넣어야</b> 열립니다.<br>
+       <span id="lockN">…</span> · 선생님께 이번 주 코드를 받으세요.</p>
+    <input id="lockPw" type="text" inputmode="text" autocomplete="off" placeholder="코드 입력">
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-primary" id="lockGo">열기</button>
+    </div>
+    <div id="lockMsg" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <h1>⚡ 전자회로 마스터</h1>
+    <span class="sub" id="hdSub"></span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-view="learn">📖 배우기</button>
+    <button class="tab"    data-view="game">🎮 게임</button>
+    <button class="tab"    data-view="practice">✏️ 연습 8문항</button>
+    <button class="tab"    data-view="exam">🏁 종합시험 20문항</button>
+    <button class="tab"    data-view="wrong">📕 오답노트</button>
+  </div>
+
+  <div id="view"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   전자회로 마스터
+   규약: https://github.com/hongyul67-cpu/links/blob/master/CONVENTIONS.md
+
+   배우기(정답을 다 보여 주는 단계) → 게임 → 연습 → 종합시험 순서입니다.
+   배우기·문항 원본은 bank.enc(AES-GCM) 안에 있고, 잠금이 풀려야 채워집니다.
+   게임 문제는 이 파일에서 그때그때 만들어 냅니다(저작물이 아닙니다).
+   ══════════════════════════════════════════════════════════════ */
+'use strict';
+
+let LEARN = [], QUESTIONS = [];
+const CFG = { practiceN:8, examN:20, storeKey:'electronic-circuit-master_v1' };
+
+const $  = s => document.querySelector(s);
+const el = h => { const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild; };
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const ri = n => Math.floor(Math.random()*n);
+
+const ST = load();
+function load(){
+  try{ return Object.assign({wrong:[],read:{},best:{},scope:'all'}, JSON.parse(localStorage.getItem(CFG.storeKey)||'{}')); }
+  catch(e){ return {wrong:[],read:{},best:{},scope:'all'}; }
+}
+function save(){ try{ localStorage.setItem(CFG.storeKey, JSON.stringify(ST)); }catch(e){} }
+
+let quiz = null;        // 지금 풀고 있는 세트
+let lastResult = null;  // 제출용 결과
+let curView = 'learn';
+let tick = null;        // 속도전 타이머 — 화면을 옮길 때 반드시 끕니다
+
+/* ── 화면 전환 ── */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    render(t.dataset.view);
+  };
+});
+
+function render(view){
+  if(tick){ clearInterval(tick); tick=null; }
+  curView = view;
+  const v = $('#view'); v.innerHTML='';
+  if(view==='learn')    return renderLearn(v);
+  if(view==='game')     return renderGameMenu(v);
+  if(view==='practice') return startQuiz(v,'practice');
+  if(view==='exam')     return startQuiz(v,'exam');
+  if(view==='wrong')    return renderWrong(v);
+}
+function goTab(name){ document.querySelector('[data-view="'+name+'"]').click(); }
+
+/* ══════════════════ 배우기 ══════════════════
+   정답을 다 보여 주는 단계입니다. 테스트보다 반드시 앞에 둡니다. */
+let learnUnit = null;
+function renderLearn(v){
+  const units = [...new Set(LEARN.map(s=>s.u))];
+  if(!units.length){ v.appendChild(el('<div class="empty">개념 자료가 아직 없습니다.</div>')); return; }
+  if(!learnUnit || !units.includes(learnUnit)) learnUnit = units[0];
+
+  const chips = el('<div class="units"></div>');
+  units.forEach(u=>{
+    const n = LEARN.filter(s=>s.u===u).length;
+    const doneN = LEARN.filter(s=>s.u===u && ST.read[s.t]).length;
+    const b = el('<button class="unit'+(u===learnUnit?' on':'')+'">'+u+'단원 <span style="opacity:.75">'+doneN+'/'+n+'</span></button>');
+    b.onclick = ()=>{ learnUnit=u; renderLearn(v); };
+    chips.appendChild(b);
+  });
+  v.innerHTML=''; v.appendChild(chips);
+
+  const secs = LEARN.filter(s=>s.u===learnUnit);
+  v.appendChild(el('<div class="card"><h3>'+secs[0].unit+'</h3>'
+    + '<div class="muted">개념 '+secs.length+'개 · 아래를 다 읽고 게임과 연습으로 넘어가세요.</div></div>'));
+
+  secs.forEach(s=>{
+    const c = el('<div class="card">'
+      + '<span class="pill">'+s.u+'단원</span>'
+      + '<h3>'+s.t+'</h3>'
+      + '<div class="body">'+s.body+'</div>'
+      + '<div class="srcline">📗 '+s.src+'</div>'
+      + '<div class="row" style="margin-top:10px"></div></div>');
+    /* 표는 좁은 화면에서 옆으로 밀어 볼 수 있게 감쌉니다 */
+    c.querySelectorAll('table.tb').forEach(t=>{
+      const w = document.createElement('div'); w.className='tw';
+      t.parentNode.insertBefore(w,t); w.appendChild(t);
+    });
+    const rd = el('<button class="btn'+(ST.read[s.t]?'':' btn-ghost')+'">'
+      + (ST.read[s.t]?'✅ 읽었어요':'읽음으로 표시') + '</button>');
+    rd.onclick = ()=>{ ST.read[s.t] = !ST.read[s.t]; save(); renderLearn(v); };
+    c.querySelector('.row').appendChild(rd);
+    v.appendChild(c);
+  });
+
+  const next = el('<div class="card row"><b>다 읽었으면</b>'
+    + '<button class="btn" id="goGame">🎮 게임으로 익히기</button>'
+    + '<button class="btn btn-primary" id="goPractice">✏️ 연습 '+CFG.practiceN+'문항</button></div>');
+  v.appendChild(next);
+  $('#goGame').onclick = ()=>goTab('game');
+  $('#goPractice').onclick = ()=>goTab('practice');
+}
+
+/* ══════════════════ 문제 풀이 ══════════════════
+   연습 : 고르는 즉시 정답·해설 공개, 점수 실시간, 연출 있음
+   종합 : 아무것도 알려주지 않음, 점수 감춤, 연출 없음 (규약 2) */
+/* 범위 —  Ⅴ~Ⅶ단원을 늘리면서 무작위로 뽑으면 지필평가 범위(Ⅰ~Ⅳ) 밖 문항이
+   절반 넘게 나오게 되었다. 그래서 시작 전에 범위를 고르게 한다. 기본은 시험 범위. */
+const SCOPES = [
+  { id:'all',  name:'전 단원 Ⅰ~Ⅶ',                     has:q => true },
+  { id:'base', name:'Ⅰ~Ⅲ 소자 · 전원 · 증폭',            has:q => ['Ⅰ','Ⅱ','Ⅲ'].includes(q.u) },
+  { id:'app',  name:'Ⅳ~Ⅶ 발진 · 변복조 · 인터페이스 · 변환', has:q => ['Ⅳ','Ⅴ','Ⅵ','Ⅶ'].includes(q.u) },
+];
+const UNITS = ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'];
+function scopeFilter(id){
+  const s = SCOPES.find(x=>x.id===id);
+  if(s) return s.has;
+  if(UNITS.includes(id)) return q => q.u===id;
+  return q => true;
+}
+function scopeName(id){
+  const s = SCOPES.find(x=>x.id===id);
+  return s ? s.name : (UNITS.includes(id) ? id+'단원만' : '전 단원');
+}
+function inScope(id){ return QUESTIONS.filter(scopeFilter(id)); }
+
+function startQuiz(v, mode){
+  const n = mode==='exam' ? CFG.examN : CFG.practiceN;
+  const part = mode==='exam' ? '종합시험' : '연습';
+  if(!QUESTIONS.length){ v.appendChild(el('<div class="empty">문항이 아직 없습니다.</div>')); return; }
+
+  const c = el('<div class="card">'
+    + '<h3>'+(mode==='exam'?'🏁 종합시험 '+n+'문항':'✏️ 연습 '+n+'문항')+'</h3>'
+    + '<div class="muted">어느 범위에서 낼지 고르세요. 다음에도 이 범위가 기억됩니다.</div>'
+    + '<div class="units" id="scChips" style="margin-top:12px"></div>'
+    + '<div class="row" style="margin-top:6px">'
+    + '<button class="btn btn-primary" id="scGo"></button>'
+    + '<span class="muted" id="scMsg"></span></div></div>');
+  v.appendChild(c);
+
+  const chips = c.querySelector('#scChips');
+  const go = c.querySelector('#scGo'), msg = c.querySelector('#scMsg');
+  function paint(){
+    chips.innerHTML = '';
+    SCOPES.concat(UNITS.map(u=>({id:u, name:u+'단원'}))).forEach(o=>{
+      const cnt = inScope(o.id).length;
+      const b = el('<button class="unit'+(ST.scope===o.id?' on':'')+'">'+o.name
+        + ' <span style="opacity:.75">'+cnt+'</span></button>');
+      b.onclick = ()=>{ ST.scope=o.id; save(); paint(); };
+      chips.appendChild(b);
+    });
+    const cnt = inScope(ST.scope).length;
+    go.textContent = '시작하기 →';
+    go.disabled = cnt===0;
+    msg.textContent = cnt===0 ? '이 범위에는 문항이 없습니다.'
+      : (cnt < n ? scopeName(ST.scope)+' 은(는) '+cnt+'문항뿐이라 '+cnt+'문항으로 봅니다.'
+                 : scopeName(ST.scope)+' '+cnt+'문항 중 '+n+'문항을 뽑습니다.');
+  }
+  paint();
+
+  go.onclick = ()=>{
+    const pool = inScope(ST.scope);
+    if(!pool.length) return;
+    quiz = { mode, i:0, correct:0, picks:[], scope:ST.scope,
+             list: shuffle(pool.slice()).slice(0, Math.min(n, pool.length)),
+             startTime: Date.now() };
+    drawQ(v);
+  };
+}
+
+function drawQ(v){
+  const q = quiz.list[quiz.i];
+  const isExam = quiz.mode==='exam';
+  v.innerHTML='';
+  v.appendChild(el('<div class="progress"><i style="width:'+(quiz.i/quiz.list.length*100)+'%"></i></div>'));
+  const card = el('<div class="card">'
+    + '<div class="qnum">'+(quiz.i+1)+' / '+quiz.list.length
+    + ' <span class="pill" style="margin-left:6px">'+q.u+'단원</span>'
+    + (isExam ? ' <span class="pill">채점은 마지막에</span>'
+              : ' <span class="pill">'+quiz.correct+'개 맞힘</span>')
+    + '</div>'
+    + '<div class="qtext">'+q.q+'</div>'
+    + '<div id="chs"></div><div id="exp"></div></div>');
+  v.appendChild(card);
+  card.querySelectorAll('table.tb').forEach(t=>{
+    const w = document.createElement('div'); w.className='tw';
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  });
+
+  const chs = card.querySelector('#chs');
+  q.ch.forEach((c,idx)=>{
+    const b = el('<button class="choice">'+(idx+1)+'. '+c+'</button>');
+    b.onclick = ()=>pickAns(v, idx, b);
+    chs.appendChild(b);
+  });
+}
+
+function pickAns(v, idx, btn){
+  const q = quiz.list[quiz.i];
+  const ok = idx === q.a;
+  quiz.picks.push({q, pick:idx, ok});
+  if(ok) quiz.correct++; else pushWrong(q, idx);
+
+  if(quiz.mode==='exam'){                 /* 종합시험 — 아무 표시 없이 다음으로 */
+    quiz.i++;
+    if(quiz.i >= quiz.list.length) return finish(v);
+    return drawQ(v);
+  }
+
+  document.querySelectorAll('.choice').forEach((b,i)=>{
+    b.disabled = true;
+    if(i===q.a) b.classList.add('correct');
+    if(i===idx) b.classList.add('picked', ok?'correct':'wrong');
+  });
+  try{ if(window.FX) ok ? FX.ok(btn) : FX.no(btn); }catch(e){ console.warn('FX', e); }
+
+  const exp = document.querySelector('#exp');
+  exp.appendChild(el('<div class="explain"><b>'+(ok?'맞았습니다':'정답은 '+(q.a+1)+'번')+'</b><br>'
+    + (q.ex||'') + '<div class="srcline">📗 '+(q.src||'')+'</div></div>'));
+  const next = el('<div class="row" style="margin-top:12px">'
+    + '<button class="btn btn-primary">'+(quiz.i+1>=quiz.list.length?'결과 보기':'다음 문제 →')+'</button></div>');
+  exp.appendChild(next);
+  next.querySelector('button').onclick = ()=>{
+    quiz.i++;
+    if(quiz.i >= quiz.list.length) return finish(v);
+    drawQ(v);
+  };
+}
+
+function pushWrong(q, p){
+  ST.wrong = ST.wrong.filter(w => w.q !== q.q);
+  ST.wrong.unshift({ u:q.u||'', topic:q.topic||'', q:q.q, ch:q.ch, a:q.a, pick:p,
+                     ex:q.ex||'', src:q.src||'', at:Date.now() });
+  ST.wrong = ST.wrong.slice(0, 100);
+  save();
+}
+
+function finish(v){
+  const n   = quiz.list.length;
+  const pct = Math.round(quiz.correct / n * 100);
+  const sec = Math.round((Date.now() - quiz.startTime)/1000);
+  const tag = quiz.scope==='exam' ? 'Ⅰ~Ⅳ단원'
+            : quiz.scope==='app'  ? 'Ⅴ~Ⅶ단원'
+            : quiz.scope==='all'  ? '전 단원' : quiz.scope+'단원';
+  const part = (quiz.mode==='exam' ? '종합시험' : '연습') + ' ' + tag;
+
+  v.innerHTML = '';
+  v.appendChild(el('<div class="card" style="text-align:center">'
+    + '<div class="score">'+pct+'점</div>'
+    + '<div class="muted">'+n+'문항 중 '+quiz.correct+'개 정답 · '
+    + Math.floor(sec/60)+'분 '+(sec%60)+'초</div>'
+    + '<div id="rankBox" style="margin-top:12px"></div>'
+    + '<div id="rSubmitAnchor" style="margin-top:12px"></div></div>'));
+
+  /* 오답노트 — 종합시험은 여기서 처음으로 정답을 본다 */
+  const bad = quiz.picks.filter(p=>!p.ok);
+  if(bad.length){
+    v.appendChild(el('<div class="card"><h3>📕 틀린 문제 '+bad.length+'개</h3>'
+      + '<div class="muted">무엇을 틀렸는지 확인하고 넘어가세요.</div></div>'));
+    bad.forEach(p=>v.appendChild(wrongCard(p.q, p.pick)));
+  } else {
+    v.appendChild(el('<div class="card" style="text-align:center">🎉 <b>다 맞혔습니다!</b></div>'));
+  }
+
+  /* 제출을 먼저 붙입니다 — 연출·계급에서 오류가 나도 제출 버튼은 살아 있어야 합니다. */
+  mountSubmit(pct, quiz.correct, n, sec, part,
+    bad.map(p => (p.q.u||'')+'단원 '+(p.q.topic||p.q.q.slice(0,18))+' → 정답 '+(p.q.a+1)+'번'),
+    ['전자회로 '+part+' '+pct+'점']);
+
+  try{
+    if(window.FX && pct>=60){
+      FX.banner({ title: pct>=90?'훌륭합니다!':'통과!', sub:part+' '+pct+'점',
+                  stars: FX.starsFor ? FX.starsFor(pct) : 0 });
+    }
+  }catch(e){ console.warn('FX', e); }
+  try{
+    if(window.Rank){
+      const res = Rank.award(pct, { mode:'전자회로 마스터 — '+part });
+      $('#rankBox').innerHTML = Rank.resultBox(res);
+    }
+  }catch(e){ console.warn('Rank', e); }
+}
+
+function wrongCard(q, p){
+  const c = el('<div class="card">'
+    + '<span class="pill">'+(q.u||'')+'단원 '+(q.topic||'')+'</span>'
+    + '<div class="qtext">'+q.q+'</div>'
+    + '<div class="muted">내가 고른 답 : '+(p+1)+'. '+q.ch[p]+'</div>'
+    + '<div style="color:var(--ok);font-weight:700">정답 : '+(q.a+1)+'. '+q.ch[q.a]+'</div>'
+    + '<div class="explain">'+(q.ex||'')+'<div class="srcline">📗 '+(q.src||'')+'</div></div></div>');
+  c.querySelectorAll('table.tb').forEach(t=>{
+    const w = document.createElement('div'); w.className='tw';
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  });
+  return c;
+}
+
+/* ── 결과 제출 (규약 1) — mode 는 파트마다 다르게, wrong 은 무엇을 틀렸는지 ── */
+function mountSubmit(pct, correct, total, sec, part, wrongList, extra){
+  lastResult = { mode:'전자회로 마스터 — '+part, score:pct, correct, total,
+                 wrong:wrongList||[], durationSec:sec };
+  const anchor = $('#rSubmitAnchor');
+  if(!(window.ResultCollector && ResultCollector.attach) || !anchor) return;
+  const btn = ResultCollector.attach(anchor, ()=>lastResult, {
+    id:'rcBtn', className:'btn btn-primary', mode:lastResult.mode, extra:extra||[] });
+  if(btn){ btn.style.width='100%'; btn.textContent = '📤 ['+part+'] 결과 제출'; }
+}
+
+/* ── 쌓인 오답노트 ── */
+function renderWrong(v){
+  if(!ST.wrong.length){
+    v.appendChild(el('<div class="empty">🗒️ 아직 오답이 없어요!<br>연습이나 종합시험을 풀면 여기에 모입니다.</div>'));
+    return;
+  }
+  const head = el('<div class="card row"><b>'+ST.wrong.length+'문항</b>'
+    + '<button class="btn" id="clrWrong">비우기</button></div>');
+  v.appendChild(head);
+  $('#clrWrong').onclick = ()=>{ ST.wrong=[]; save(); render('wrong'); };
+  ST.wrong.forEach(w=>v.appendChild(wrongCard(w, w.pick)));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   게임 — 문제를 그때그때 만들어 냅니다
+   ══════════════════════════════════════════════════════════════ */
+const GAMES = [
+  { id:'sym',  emoji:'🔎', name:'소자 기호 판별',   desc:'회로 기호를 보고 소자 이름을 고릅니다. 10문항.', run:gameSym },
+  { id:'wav',  emoji:'〰️', name:'파형 맞히기',     desc:'정류·발진·변조 파형을 보고 무엇인지 고릅니다. 10문항.', run:gameWave },
+  { id:'calc', emoji:'⚡', name:'회로 계산 속도전', desc:'60초 동안 이득·시상수·분해능을 몇 개 맞히나.', run:gameCalc },
+  { id:'srt',  emoji:'🗂️', name:'갈래 나누기',     desc:'소자·변조·회로를 갈래별로 나눕니다.', run:gameSort },
+];
+
+function renderGameMenu(v){
+  v.appendChild(el('<div class="card"><h3>🎮 게임</h3>'
+    + '<div class="muted">배우기에서 본 내용을 손으로 해 보는 곳입니다. 결과는 게임마다 따로 제출됩니다.</div></div>'));
+  const g = el('<div class="gmenu"></div>');
+  GAMES.forEach(gm=>{
+    const b = el('<button class="gcard"><b>'+gm.emoji+' '+gm.name+'</b><span>'+gm.desc+'</span>'
+      + (ST.best[gm.id]!=null ? '<span style="display:block;margin-top:6px;color:var(--pri);font-weight:800">최고 '+ST.best[gm.id]+'점</span>' : '')
+      + '</button>');
+    b.onclick = ()=>{ const w=$('#view'); w.innerHTML=''; gm.run(w); };
+    g.appendChild(b);
+  });
+  v.appendChild(g);
+}
+function gameHead(v, gm, extraHtml){
+  const c = el('<div class="card"><div class="row" style="justify-content:space-between">'
+    + '<b>'+gm.emoji+' '+gm.name+'</b>'
+    + '<button class="btn btn-ghost" id="gBack">← 게임 목록</button></div>'
+    + (extraHtml||'') + '</div>');
+  v.appendChild(c);
+  $('#gBack').onclick = ()=>{ if(tick){clearInterval(tick);tick=null;} render('game'); };
+  return c;
+}
+function gameFinish(v, gm, pct, right, total, sec, wrongList, extra){
+  if(ST.best[gm.id]==null || pct>ST.best[gm.id]){ ST.best[gm.id]=pct; save(); }
+  v.innerHTML='';
+  gameHead(v, gm);
+  v.appendChild(el('<div class="card" style="text-align:center">'
+    + '<div class="score">'+pct+'점</div>'
+    + '<div class="muted">'+total+'문제 중 '+right+'개 정답 · '+sec+'초</div>'
+    + '<div id="rankBox" style="margin-top:12px"></div>'
+    + '<div id="rSubmitAnchor" style="margin-top:12px"></div></div>'));
+  if(wrongList && wrongList.length){
+    v.appendChild(el('<div class="card"><h3>📕 놓친 것</h3><div class="muted">'
+      + wrongList.map(w=>'· '+w).join('<br>') + '</div></div>'));
+  }
+  const again = el('<div class="card row"><button class="btn btn-primary">다시 하기</button>'
+    + '<button class="btn">다른 게임</button></div>');
+  v.appendChild(again);
+  again.querySelectorAll('button')[0].onclick = ()=>{ const w=$('#view'); w.innerHTML=''; gm.run(w); };
+  again.querySelectorAll('button')[1].onclick = ()=>render('game');
+
+  mountSubmit(pct, right, total, sec, gm.name, wrongList||[], extra||['전자회로 '+gm.name+' '+pct+'점']);
+  try{ if(window.FX && pct>=60) FX.banner({ title:pct>=90?'완벽!':'통과!', sub:gm.name+' '+pct+'점',
+        stars: FX.starsFor?FX.starsFor(pct):0 }); }catch(e){ console.warn('FX',e); }
+  try{ if(window.Rank){ const r=Rank.award(pct,{mode:'전자회로 마스터 — '+gm.name});
+        $('#rankBox').innerHTML = Rank.resultBox(r); } }catch(e){ console.warn('Rank',e); }
+}
+
+/* ── 회로 기호 그리기 (게임 공용) ──
+   교과서 회로 기호를 SVG 로 직접 그립니다. 이미지 파일을 쓰지 않는 이유 —
+   교과서 그림을 그대로 올릴 수 없고, 확대·다크모드에서도 깨지지 않아야 하기 때문입니다. */
+function sym(name){
+  const W=140,H=70, S='stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"';
+  const T='stroke="currentColor" fill="currentColor"';
+  const wire=(x1,y1,x2,y2)=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" '+S+'/>';
+  const box=b=>'<svg viewBox="0 0 '+W+' '+H+'" width="140" height="70" aria-hidden="true">'+b+'</svg>';
+  const tri=(x,y)=>'<path d="M'+x+' '+(y-14)+' L'+(x+24)+' '+y+' L'+x+' '+(y+14)+' Z" '+T+'/>';
+  const c=35;
+  switch(name){
+    case '다이오드':
+      return box(wire(6,c,50,c)+tri(50,c)+wire(74,c-14,74,c+14)+wire(74,c,134,c));
+    case '제너 다이오드':
+      return box(wire(6,c,50,c)+tri(50,c)+'<path d="M64 '+(c-14)+' L74 '+(c-14)+' L74 '+(c+14)+' L84 '+(c+14)+'" '+S+'/>'+wire(74,c,134,c));
+    case '발광 다이오드(LED)':
+      return box(wire(6,c,50,c)+tri(50,c)+wire(74,c-14,74,c+14)+wire(74,c,134,c)
+        +'<path d="M58 12 L72 0" '+S+'/><path d="M72 0 l-1 6 M72 0 l-6 1" '+S+'/>'
+        +'<path d="M72 12 L86 0" '+S+'/><path d="M86 0 l-1 6 M86 0 l-6 1" '+S+'/>');
+    case '포토다이오드':
+      return box(wire(6,c,50,c)+tri(50,c)+wire(74,c-14,74,c+14)+wire(74,c,134,c)
+        +'<path d="M72 0 L58 12" '+S+'/><path d="M58 12 l1 -6 M58 12 l6 -1" '+S+'/>'
+        +'<path d="M86 0 L72 12" '+S+'/><path d="M72 12 l1 -6 M72 12 l6 -1" '+S+'/>');
+    case 'npn 트랜지스터':
+      return box('<circle cx="70" cy="35" r="26" '+S+'/>'+wire(6,35,58,35)+wire(58,18,58,52)
+        +wire(58,26,90,12)+wire(58,44,90,58)+wire(90,12,90,4)+wire(90,58,90,66)
+        +'<path d="M82 53 l8 5 l-9 3 z" '+T+'/>');
+    case 'pnp 트랜지스터':
+      return box('<circle cx="70" cy="35" r="26" '+S+'/>'+wire(6,35,58,35)+wire(58,18,58,52)
+        +wire(58,26,90,12)+wire(58,44,90,58)+wire(90,12,90,4)+wire(90,58,90,66)
+        +'<path d="M66 41 l-9 3 l8 5 z" '+T+'/>');
+    case 'n채널 JFET':
+      return box('<circle cx="70" cy="35" r="26" '+S+'/>'+wire(6,35,56,35)+wire(56,16,56,54)
+        +wire(56,22,88,22)+wire(56,48,88,48)+wire(88,22,88,4)+wire(88,48,88,66)
+        +'<path d="M38 30 l10 5 l-10 5 z" '+T+'/>');
+    case '증가형 n채널 MOS-FET':
+      return box('<circle cx="70" cy="35" r="26" '+S+'/>'+wire(6,35,52,35)+wire(52,16,52,54)
+        +'<path d="M60 16 L60 24 M60 31 L60 39 M60 46 L60 54" '+S+'/>'
+        +wire(60,20,88,20)+wire(60,35,88,35)+wire(60,50,88,50)+wire(88,20,88,4)+wire(88,50,88,66)+wire(88,35,88,50)
+        +'<path d="M70 30 l10 5 l-10 5 z" '+T+'/>');
+    case 'UJT (단접합 트랜지스터)':
+      return box('<circle cx="70" cy="35" r="26" '+S+'/>'+wire(6,35,56,35)+wire(56,16,56,54)
+        +wire(56,22,88,22)+wire(56,48,88,48)+wire(88,22,88,4)+wire(88,48,88,66)
+        +'<path d="M40 30 l10 5 l-10 5 z" '+T+'/>');
+    case 'SCR (실리콘 제어 정류기)':
+      return box(wire(6,c,50,c)+tri(50,c)+wire(74,c-14,74,c+14)+wire(74,c,134,c)
+        +wire(70,c+12,70,64)+wire(70,64,110,64));
+    case '광도전체(CdS)':
+      return box(wire(6,35,34,35)+'<rect x="34" y="23" width="48" height="24" '+S+'/>'+wire(82,35,134,35)
+        +'<path d="M56 4 L44 18" '+S+'/><path d="M44 18 l1 -6 M44 18 l6 -1" '+S+'/>'
+        +'<path d="M72 4 L60 18" '+S+'/><path d="M60 18 l1 -6 M60 18 l6 -1" '+S+'/>');
+    case '커패시터':
+      return box(wire(6,35,62,35)+wire(62,16,62,54)+wire(78,16,78,54)+wire(78,35,134,35));
+    case '인덕터':
+      return box(wire(6,35,40,35)+'<path d="M40 35 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0" '+S+'/>'+wire(100,35,134,35));
+    case '저항':
+      return box(wire(6,35,34,35)+'<rect x="34" y="25" width="48" height="20" '+S+'/>'+wire(82,35,134,35));
+    case '연산 증폭기':
+      return box('<path d="M46 8 L46 62 L104 35 Z" '+S+'/>'+wire(6,22,46,22)+wire(6,48,46,48)+wire(104,35,134,35)
+        +'<text x="52" y="27" font-size="13" fill="currentColor">−</text>'
+        +'<text x="52" y="53" font-size="13" fill="currentColor">+</text>');
+    case '포토커플러':
+      return box('<rect x="30" y="8" width="80" height="54" '+S+' stroke-dasharray="4 3"/>'
+        +wire(6,20,40,20)+'<path d="M40 12 L40 28 L54 20 Z" '+T+'/>'+wire(54,12,54,28)+wire(54,20,60,20)
+        +'<path d="M64 16 L74 20 M64 24 L74 26" '+S+'/>'
+        +'<circle cx="92" cy="45" r="13" '+S+'/>'+wire(79,45,72,45)+wire(79,38,79,52)
+        +wire(79,41,102,33)+wire(79,49,102,57)+wire(102,33,134,33)+wire(102,57,134,57));
+  }
+  return box('');
+}
+
+/* ── 파형 그리기 (게임 공용) ── */
+function wave(kind){
+  const W=220,H=80,mid=40,A=28;
+  const pts=[];
+  for(let i=0;i<=440;i++){
+    const x=i*W/440, t=i/440*4*Math.PI;   // 2주기
+    let y;
+    switch(kind){
+      case '사인파':        y=mid-A*Math.sin(t); break;
+      case '반파 정류 출력': y=mid-A*Math.max(0,Math.sin(t)); break;
+      case '전파 정류 출력': y=mid-A*Math.abs(Math.sin(t)); break;
+      case '직사각형파':     y=mid-A*(Math.sin(t)>=0?1:0); break;
+      case '삼각파':        y=mid-A*(2/Math.PI)*Math.asin(Math.sin(t)); break;
+      case '톱니파':        y=mid-A*(((t/(2*Math.PI))%1)*2-1); break;
+      case 'AM (진폭 변조)': y=mid-A*(0.55+0.45*Math.sin(t/8))*Math.sin(t*7); break;
+      case 'FM (주파수 변조)':{ const f=7+4*Math.sin(t/8); y=mid-A*Math.sin(t*f); break; }
+      case 'PWM (펄스 폭 변조)':{ const ph=(t/(2*Math.PI)*6)%1, duty=0.2+0.6*(0.5+0.5*Math.sin(t/6));
+                                 y=mid-A*(ph<duty?1:0); break; }
+      case 'PAM (펄스 진폭 변조)':{ const ph=(t/(2*Math.PI)*6)%1, amp=0.35+0.65*(0.5+0.5*Math.sin(t/6));
+                                 y=mid-A*(ph<0.45?amp:0); break; }
+      default: y=mid;
+    }
+    pts.push((x).toFixed(1)+','+(y).toFixed(1));
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="220" height="80" aria-hidden="true">'
+    + '<line x1="0" y1="'+mid+'" x2="'+W+'" y2="'+mid+'" stroke="currentColor" stroke-width="1" opacity=".3"/>'
+    + '<polyline points="'+pts.join(' ')+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+
+/* ══════ 게임 1 — 소자 기호 판별 ══════ */
+const SYMBOLS = [
+  { n:'다이오드',              use:'교류를 직류로 바꾸는 정류 회로' },
+  { n:'제너 다이오드',          use:'항복 전압을 이용한 정전압 안정화 회로' },
+  { n:'발광 다이오드(LED)',     use:'표시등·조명·디스플레이' },
+  { n:'포토다이오드',           use:'빛을 검출하는 센서 회로' },
+  { n:'npn 트랜지스터',         use:'전자가 다수 반송자인 증폭·스위칭 소자' },
+  { n:'pnp 트랜지스터',         use:'정공이 다수 반송자인 증폭·스위칭 소자' },
+  { n:'n채널 JFET',            use:'p-n 접합형 게이트를 가진 전압 제어 소자' },
+  { n:'증가형 n채널 MOS-FET',   use:'게이트가 0[V]일 때 채널이 없는 상시 차단 소자' },
+  { n:'UJT (단접합 트랜지스터)', use:'부성저항을 이용한 펄스 발진 회로' },
+  { n:'SCR (실리콘 제어 정류기)', use:'게이트 트리거로 도통하는 무접점 스위치' },
+  { n:'광도전체(CdS)',          use:'빛에 따라 저항이 변하는 광센서' },
+  { n:'커패시터',              use:'저주파를 막고 고주파를 통과시키는 소자' },
+  { n:'인덕터',                use:'저주파를 통과시키고 고주파를 막는 소자' },
+  { n:'저항',                  use:'전류의 흐름을 제한하는 소자' },
+  { n:'연산 증폭기',            use:'두 입력의 차를 크게 증폭하는 차동 증폭기' },
+  { n:'포토커플러',            use:'입출력이 절연된 채 빛으로 신호를 전달' },
+];
+function gameSym(v){
+  const gm = GAMES[0], N = 10;
+  const pool = shuffle(SYMBOLS.slice()).slice(0, N);
+  let i = 0, right = 0, combo = 0, best = 0;
+  const wrongList = [];
+  const t0 = Date.now();
+  step();
+  function step(){
+    if(i >= N){
+      const sec = Math.round((Date.now()-t0)/1000);
+      return gameFinish(v, gm, Math.round(right/N*100), right, N, sec, wrongList,
+        ['전자회로 소자 기호 판별 '+right+'/'+N+' · 최고 '+best+'연속']);
+    }
+    const q = pool[i];
+    const opts = shuffle([q.n].concat(shuffle(SYMBOLS.filter(s=>s.n!==q.n)).slice(0,3).map(s=>s.n)));
+    v.innerHTML=''; gameHead(v, gm,
+      '<div class="muted">이 회로 기호의 이름은? &nbsp;<b>'+(i+1)+' / '+N+'</b>'
+      + (combo>1?' &nbsp;<span style="color:var(--pri);font-weight:800">'+combo+' 연속</span>':'')+'</div>');
+    const card = el('<div class="card" style="text-align:center">'
+      + '<div style="color:var(--tx);margin:10px 0 16px">'+sym(q.n)+'</div>'
+      + '<div class="gopts"></div><div id="fb" style="margin-top:10px"></div></div>');
+    v.appendChild(card);
+    const wrap = card.querySelector('.gopts');
+    opts.forEach(o=>{
+      const b = el('<button class="btn" style="display:block;width:100%;margin:6px 0;text-align:left">'+o+'</button>');
+      b.onclick = ()=>{
+        wrap.querySelectorAll('button').forEach(x=>x.disabled=true);
+        const ok = (o === q.n);
+        if(ok){ right++; combo++; best=Math.max(best,combo); b.classList.add('correct');
+                try{ if(window.FX){ FX.burst(b); FX.punch(b);} }catch(e){} }
+        else { combo=0; b.classList.add('wrong'); wrongList.push(q.n+' 을(를) '+o+' 로 고름');
+               wrap.querySelectorAll('button').forEach(x=>{ if(x.textContent===q.n) x.classList.add('correct'); });
+               try{ if(window.FX) FX.shake(card); }catch(e){} }
+        card.querySelector('#fb').innerHTML =
+          '<div class="explain"><b>'+q.n+'</b> — '+q.use+'</div>';
+        const nx = el('<button class="btn btn-primary" style="margin-top:10px">다음 →</button>');
+        nx.onclick = ()=>{ i++; step(); };
+        card.querySelector('#fb').appendChild(nx);
+      };
+      wrap.appendChild(b);
+    });
+  }
+}
+
+/* ══════ 게임 2 — 파형 맞히기 ══════ */
+const WAVES = [
+  { n:'사인파',            ex:'변조하지 않은 반송파나 상용 교류의 기본 파형입니다.' },
+  { n:'반파 정류 출력',     ex:'다이오드 1개로 양(+) 반주기만 통과시킨 파형입니다. 리플 잡음이 가장 큽니다.' },
+  { n:'전파 정류 출력',     ex:'양·음 반주기를 모두 같은 방향으로 만든 파형입니다. 주파수는 입력의 2배가 됩니다.' },
+  { n:'직사각형파',        ex:'구형파라고도 하며 논리 게이트의 클록 신호로 쓰입니다.' },
+  { n:'삼각파',            ex:'비사인파 발진 회로에서 만들어지는 파형입니다.' },
+  { n:'톱니파',            ex:'비사인파 발진 회로의 하나로, 완만히 올라갔다 급히 떨어집니다.' },
+  { n:'AM (진폭 변조)',     ex:'반송파의 진폭이 정보 신호를 따라 변합니다. 그 외곽선이 포락선입니다.' },
+  { n:'FM (주파수 변조)',   ex:'진폭은 일정하고 주파수가 정보 신호에 따라 변합니다.' },
+  { n:'PWM (펄스 폭 변조)', ex:'펄스의 폭이 변합니다. DC 모터의 속도 제어에 씁니다.' },
+  { n:'PAM (펄스 진폭 변조)', ex:'펄스의 진폭이 정보 신호에 따라 변합니다.' },
+];
+function gameWave(v){
+  const gm = GAMES[1], N = 10;
+  const pool = shuffle(WAVES.slice()).slice(0, N);
+  let i=0, right=0, combo=0, best=0;
+  const wrongList=[], t0=Date.now();
+  step();
+  function step(){
+    if(i>=N){
+      const sec=Math.round((Date.now()-t0)/1000);
+      return gameFinish(v, gm, Math.round(right/N*100), right, N, sec, wrongList,
+        ['전자회로 파형 판별 '+right+'/'+N+' · 최고 '+best+'연속']);
+    }
+    const q = pool[i];
+    const opts = shuffle([q.n].concat(shuffle(WAVES.filter(s=>s.n!==q.n)).slice(0,3).map(s=>s.n)));
+    v.innerHTML=''; gameHead(v, gm,
+      '<div class="muted">이 파형의 이름은? &nbsp;<b>'+(i+1)+' / '+N+'</b>'
+      + (combo>1?' &nbsp;<span style="color:var(--pri);font-weight:800">'+combo+' 연속</span>':'')+'</div>');
+    const card = el('<div class="card" style="text-align:center">'
+      + '<div style="color:var(--tx);margin:10px 0 16px;overflow-x:auto">'+wave(q.n)+'</div>'
+      + '<div class="gopts"></div><div id="fb" style="margin-top:10px"></div></div>');
+    v.appendChild(card);
+    const wrap = card.querySelector('.gopts');
+    opts.forEach(o=>{
+      const b = el('<button class="btn" style="display:block;width:100%;margin:6px 0;text-align:left">'+o+'</button>');
+      b.onclick = ()=>{
+        wrap.querySelectorAll('button').forEach(x=>x.disabled=true);
+        if(o===q.n){ right++; combo++; best=Math.max(best,combo); b.classList.add('correct');
+                     try{ if(window.FX){FX.burst(b);FX.punch(b);} }catch(e){} }
+        else { combo=0; b.classList.add('wrong'); wrongList.push(q.n+' 을(를) '+o+' 로 고름');
+               wrap.querySelectorAll('button').forEach(x=>{ if(x.textContent===q.n) x.classList.add('correct'); });
+               try{ if(window.FX) FX.shake(card); }catch(e){} }
+        card.querySelector('#fb').innerHTML='<div class="explain"><b>'+q.n+'</b> — '+q.ex+'</div>';
+        const nx = el('<button class="btn btn-primary" style="margin-top:10px">다음 →</button>');
+        nx.onclick=()=>{ i++; step(); };
+        card.querySelector('#fb').appendChild(nx);
+      };
+      wrap.appendChild(b);
+    });
+  }
+}
+
+/* ══════ 게임 3 — 회로 계산 속도전 (60초) ══════
+   교과서에 나온 공식만 씁니다. 숫자는 매번 새로 만듭니다. */
+/* 보기 만들기 — 생성기가 낸 오답이 정답과 겹치는 일이 있어(전체의 약 10%)
+   겹치면 걸러 내고, 모자란 만큼 정답의 수를 배수로 비틀어 채운다.
+   이렇게 하지 않으면 보기가 3개로 줄어 정답 확률이 올라간다. */
+function optionSet(ans, cands){
+  const out = [];
+  (cands||[]).forEach(c => { if(c !== ans && out.indexOf(c) < 0) out.push(c); });
+  const m = String(ans).match(/^(−?-?[\d.]+)(.*)$/);
+  if(m){
+    const neg = String(ans).charAt(0) === '−';
+    const base = parseFloat(m[1].replace('−','-'));
+    const mult = [2, 0.5, 4, 3, 0.25, 10];
+    for(let i = 0; i < mult.length && out.length < 3; i++){
+      let v = Math.abs(base) * mult[i];
+      v = (Math.abs(v) >= 1000) ? Math.round(v) : +v.toFixed(4);
+      const s = (neg ? '−' : '') + v + m[2];
+      if(s !== ans && out.indexOf(s) < 0) out.push(s);
+    }
+  }
+  return shuffle([ans].concat(out.slice(0, 3)));
+}
+
+function calcProblem(){
+  const pick = a => a[ri(a.length)];
+  const k = ri(10);
+  if(k===0){ const T=pick([4,5,8,10,20]), tw=pick([1,2,3]).valueOf()*(T/ (T>=8?4:1));
+    const w=Math.min(tw,T-1), d=Math.round(w/T*100);
+    return { q:'펄스폭 '+w+'[ms], 주기 '+T+'[ms] 인 펄스의 <b>듀티비</b>는?', a:d+'%',
+      ex:'듀티비 = 펄스폭/주기 × 100 = '+w+'/'+T+' × 100 = '+d+'%',
+      mk:()=>[Math.max(1,d-25)+'%',(d+25)+'%',Math.round(100-d)+'%'] };
+  }
+  if(k===1){ const R=pick([1,2,5,10]), C=pick([1,2,10,100]);
+    const tau=R*C; // kΩ × µF = ms
+    return { q:'R = '+R+'[kΩ], C = '+C+'[µF] 인 RC 직렬 회로의 <b>시상수</b>는?', a:tau+'[ms]',
+      ex:'τ = RC = ('+R+'×10³) × ('+C+'×10⁻⁶) = '+tau+'×10⁻³[s] = '+tau+'[ms]',
+      mk:()=>[(tau*10)+'[ms]',(tau/2)+'[ms]',(R+C)+'[ms]'] };
+  }
+  if(k===2){ const R=pick([1,2,5,10]), L=pick([2,10,20,50]);
+    const tau=L/R; // mH / kΩ = µs
+    return { q:'R = '+R+'[kΩ], L = '+L+'[mH] 인 RL 직렬 회로의 <b>시상수</b>는?', a:tau+'[µs]',
+      ex:'τ = L/R = ('+L+'×10⁻³) / ('+R+'×10³) = '+tau+'×10⁻⁶[s] = '+tau+'[µs]',
+      mk:()=>[(tau*10)+'[µs]',(R*L)+'[µs]',(tau/2)+'[µs]'] };
+  }
+  if(k===3){ const R1=pick([1,2,4,5,10]), m=pick([2,3,4,5,10]); const RF=R1*m;
+    return { q:'<b>반전</b> 증폭 회로에서 R<sub>1</sub> = '+R1+'[kΩ], R<sub>F</sub> = '+RF+'[kΩ] 일 때 전압 이득은?', a:'−'+m,
+      ex:'A<sub>V</sub> = − R<sub>F</sub>/R<sub>1</sub> = − '+RF+'/'+R1+' = −'+m+' (− 부호는 180° 위상차)',
+      mk:()=>['+'+m,'−'+(m+1),'+'+(m+1)] };
+  }
+  if(k===4){ const R1=pick([1,2,4,5,10]), m=pick([1,2,3,4,9]); const RF=R1*m;
+    return { q:'<b>비반전</b> 증폭 회로에서 R<sub>1</sub> = '+R1+'[kΩ], R<sub>F</sub> = '+RF+'[kΩ] 일 때 전압 이득은?', a:''+(m+1),
+      ex:'A<sub>V</sub> = 1 + R<sub>F</sub>/R<sub>1</sub> = 1 + '+m+' = '+(m+1),
+      mk:()=>[''+m,'−'+(m+1),''+(m+2)] };
+  }
+  if(k===5){ const IE=pick([1,2,2.5,5,12.5]); const re=+(25/IE).toFixed(1);
+    return { q:'직류 이미터 전류 I<sub>E</sub> = '+IE+'[mA] 일 때 <b>교류 이미터 저항</b> r<sub>e</sub>′ 는?', a:re+'[Ω]',
+      ex:'r<sub>e</sub>′ = 25[mV] / I<sub>E</sub> = 25 / '+IE+' = '+re+'[Ω]',
+      mk:()=>[(re*2)+'[Ω]',(+(IE*25).toFixed(1))+'[Ω]',(+(re/2).toFixed(1))+'[Ω]'] };
+  }
+  if(k===6){ const Vz=pick([3.3,5.1,6.2,9.1,12]); const vo=+(Vz-0.7).toFixed(1);
+    return { q:'제너 다이오드와 트랜지스터로 만든 정전압 회로에서 V<sub>Z</sub> = '+Vz+'[V], V<sub>BE</sub> = 0.7[V] 일 때 출력 V<sub>o</sub> 는?', a:vo+'[V]',
+      ex:'V<sub>o</sub> = V<sub>Z</sub> − V<sub>BE</sub> = '+Vz+' − 0.7 = '+vo+'[V]',
+      mk:()=>[(+(Vz+0.7).toFixed(1))+'[V]',Vz+'[V]','0.7[V]'] };
+  }
+  if(k===7){ const n=pick([3,4,5,6,8]); const cnt=Math.pow(2,n)-1;
+    return { q:'<b>'+n+'비트 병렬형</b> AD 변환 회로에 필요한 <b>비교기의 수</b>는?', a:cnt+'개',
+      ex:'n비트 병렬형에는 2ⁿ − 1 개가 필요합니다. 2^'+n+' − 1 = '+cnt+'개',
+      mk:()=>[Math.pow(2,n)+'개',n+'개',(cnt+2)+'개'] };
+  }
+  if(k===8){ const n=pick([3,4,5]), V=pick([5,8,10]); const st=+(V/Math.pow(2,n)).toFixed(4);
+    return { q:'기준 전압 '+V+'[V] 인 <b>'+n+'비트</b> DA 변환 회로의 <b>1스텝 전압</b>은?', a:st+'[V]',
+      ex:'1스텝 = '+V+'[V] × 1/2^'+n+' = '+V+'/'+Math.pow(2,n)+' = '+st+'[V]',
+      mk:()=>[(+(V/n).toFixed(4))+'[V]',(+(st*2).toFixed(4))+'[V]',(+(V/(Math.pow(2,n)-1)).toFixed(4))+'[V]'] };
+  }
+  const n=pick([4,6,8,10]); const r=Math.pow(2,n-1);
+  return { q:'<b>'+n+'비트 가산기형</b> DA 변환 회로에서 MSB 저항이 1[kΩ] 이면 <b>LSB 저항</b>은?', a:r+'[kΩ]',
+    ex:'저항은 2ⁿ 비율로 배열되므로 LSB는 MSB의 2^('+n+'−1) = '+r+'배입니다.',
+    mk:()=>[Math.pow(2,n)+'[kΩ]',(n*2)+'[kΩ]',(r/2)+'[kΩ]'] };
+}
+function gameCalc(v){
+  const gm = GAMES[2], LIMIT = 60;
+  const st = { right:0, total:0, combo:0, best:0, wrong:[] };
+  const t0 = Date.now();
+  if(tick){ clearInterval(tick); }
+  next();
+  tick = setInterval(()=>{
+    const left = LIMIT - Math.round((Date.now()-t0)/1000);
+    const e = document.getElementById('gTime');
+    if(e) e.textContent = Math.max(0,left)+'초';
+    if(left<=0) finish();
+  }, 250);
+  function next(){
+    const p = calcProblem();
+    const opts = optionSet(p.a, p.mk());
+    v.innerHTML=''; gameHead(v, gm,
+      '<div class="row" style="justify-content:space-between">'
+      + '<span class="muted">맞힌 개수 <b>'+st.right+'</b> / '+st.total
+      + (st.combo>1?' &nbsp;<span style="color:var(--pri);font-weight:800">'+st.combo+' 연속</span>':'')+'</span>'
+      + '<span id="gTime" style="font-weight:800;color:var(--pri)">'+LIMIT+'초</span></div>');
+    const card = el('<div class="card"><div class="qtext">'+p.q+'</div><div class="gopts"></div></div>');
+    v.appendChild(card);
+    const wrap = card.querySelector('.gopts');
+    opts.forEach(o=>{
+      const b = el('<button class="btn" style="display:block;width:100%;margin:6px 0">'+o+'</button>');
+      b.onclick = ()=>{
+        st.total++;
+        if(o===p.a){ st.right++; st.combo++; st.best=Math.max(st.best,st.combo);
+                     try{ if(window.FX){FX.burst(b);FX.punch(b);} }catch(e){} }
+        else { st.combo=0; st.wrong.push(p.q.replace(/<[^>]+>/g,'')+' → '+p.a);
+               try{ if(window.FX) FX.shake(card); }catch(e){} }
+        next();
+      };
+      wrap.appendChild(b);
+    });
+  }
+  function finish(){
+    if(tick){ clearInterval(tick); tick=null; }
+    const pct = st.total ? Math.round(st.right/st.total*100) : 0;
+    const w = st.wrong.slice(0,8);
+    if(st.wrong.length>8) w.push('… 그 밖 '+(st.wrong.length-8)+'개');
+    gameFinish(v, gm, pct, st.right, Math.max(st.total,1), LIMIT, w,
+      ['전자회로 회로 계산 '+st.right+'개 정답 · 최고 '+st.best+'연속']);
+  }
+}
+
+/* ══════ 게임 4 — 갈래 나누기 ══════ */
+const SORTS = [
+  { title:'이 소자는 어느 갈래인가?', cats:['수광 소자','발광 소자','광결합 소자'],
+    items:[['포토다이오드',0],['포토트랜지스터',0],['태양 전지',0],['광도전체(CdS)',0],
+           ['발광 다이오드(LED)',1],['레이저 다이오드(LD)',1],['고체 레이저',1],
+           ['포토아이솔레이터',2],['포토인터럽터',2]] },
+  { title:'이 변조 방식은 무엇을 바꾸는가?', cats:['진폭','주파수','위상','펄스의 폭'],
+    items:[['AM',0],['ASK',0],['PAM',0],['FM',1],['FSK',1],['PSK',2],['PWM',3]] },
+  { title:'이 AD 변환 방식의 설명으로 맞는 갈래는?', cats:['가장 빠르지만 비교기가 많이 필요','카운터를 써서 느림','SAR 로 상위 비트부터 좁혀 감'],
+    items:[['병렬형(플래시)',0],['계수형(계단형)',1],['추적형',1],['축차 근사형',2]] },
+  { title:'이것은 직류 전원 회로의 몇 번째 단계인가?', cats:['변압','정류','평활','정전압 안정화'],
+    items:[['교류 전압의 크기를 바꾼다',0],['다이오드로 한 방향만 흐르게 한다',1],
+           ['저역 통과 필터로 잡음을 없앤다',2],['제너 다이오드로 전압을 일정하게 한다',3]] },
+  { title:'이 소자는 TTL 과 CMOS 중 어느 쪽 특징인가?', cats:['TTL','CMOS'],
+    items:[['바이폴라 트랜지스터로 만든다',0],['대부분 +5[V]에서 동작한다',0],['동작 속도가 빠르다',0],
+           ['증가형 MOS-FET 로 만든다',1],['3~18[V]로 사용 전압 범위가 넓다',1],
+           ['소비 전력이 매우 적다',1],['잡음 여유도가 크다',1],['정전기에 파괴되기 쉽다',1]] },
+  { title:'이 증폭 회로의 주된 용도는?', cats:['전압 증폭','임피던스 정합·버퍼','고주파 증폭'],
+    items:[['공통 이미터 증폭 회로',0],['공통 컬렉터 증폭 회로(이미터 폴로어)',1],
+           ['버퍼(전압 폴로어) 회로',1],['공통 베이스 증폭 회로',2]] },
+];
+function gameSort(v){
+  const gm = GAMES[3];
+  const set = SORTS[ri(SORTS.length)];
+  const items = shuffle(set.items.slice()).slice(0, Math.min(8, set.items.length));
+  let i=0, right=0, combo=0, best=0;
+  const wrongList=[], t0=Date.now();
+  step();
+  function step(){
+    if(i>=items.length){
+      const sec=Math.round((Date.now()-t0)/1000);
+      return gameFinish(v, gm, Math.round(right/items.length*100), right, items.length, sec, wrongList,
+        ['전자회로 갈래 나누기 '+right+'/'+items.length+' · 최고 '+best+'연속']);
+    }
+    const [label, ans] = items[i];
+    v.innerHTML=''; gameHead(v, gm,
+      '<div class="muted">'+set.title+' &nbsp;<b>'+(i+1)+' / '+items.length+'</b>'
+      + (combo>1?' &nbsp;<span style="color:var(--pri);font-weight:800">'+combo+' 연속</span>':'')+'</div>');
+    const card = el('<div class="card"><div class="qtext" style="text-align:center;margin:8px 0 14px">'
+      + label + '</div><div class="gopts"></div><div id="fb" style="margin-top:10px"></div></div>');
+    v.appendChild(card);
+    const wrap = card.querySelector('.gopts');
+    set.cats.forEach((c,idx)=>{
+      const b = el('<button class="btn" style="display:block;width:100%;margin:6px 0">'+c+'</button>');
+      b.onclick = ()=>{
+        wrap.querySelectorAll('button').forEach(x=>x.disabled=true);
+        if(idx===ans){ right++; combo++; best=Math.max(best,combo); b.classList.add('correct');
+                       try{ if(window.FX){FX.burst(b);FX.punch(b);} }catch(e){} }
+        else { combo=0; b.classList.add('wrong'); wrongList.push(label+' → '+set.cats[ans]);
+               wrap.querySelectorAll('button')[ans].classList.add('correct');
+               try{ if(window.FX) FX.shake(card); }catch(e){} }
+        card.querySelector('#fb').innerHTML =
+          '<div class="explain"><b>'+label+'</b> → '+set.cats[ans]+'</div>';
+        const nx = el('<button class="btn btn-primary" style="margin-top:10px">다음 →</button>');
+        nx.onclick=()=>{ i++; step(); };
+        card.querySelector('#fb').appendChild(nx);
+      };
+      wrap.appendChild(b);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   잠금 해제
+   정적 호스팅에서는 화면에 비밀번호 칸만 두면 보호가 되지 않습니다
+   (파일 주소를 직접 치면 그대로 받아지기 때문입니다).
+   그래서 자료 파일 자체를 AES-GCM 으로 암호화해 두고 여기서 실제로 복호화합니다.
+
+   저장 키가 두 개인 이유
+     LOCK_KEY   이 도구에서 성공한 암호
+     SHARED_KEY 도구 전체 공용 — 도구가 모두 같은 주소에 있어 localStorage 를
+                공유하므로, 어디서든 한 번 열면 나머지도 그냥 열립니다.
+   실패해도 공용 키는 지우지 않습니다 — 여기서 안 맞는 암호가 다른 도구에서는
+   맞을 수 있어, 지우면 남의 기억까지 날리게 됩니다.
+   ══════════════════════════════════════════════════════════════ */
+const LOCK_KEY='ecm_v1_pw', SHARED_KEY='hong_pw_v1';
+const b64 = x => Uint8Array.from(atob(x), ch=>ch.charCodeAt(0));
+const isoOf = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const mondayOf = d => { const x=new Date(d); x.setDate(x.getDate()-((x.getDay()+6)%7)); x.setHours(0,0,0,0); return x; };
+const prettyCode = s => s.length===8 ? s.slice(0,4)+' '+s.slice(4) : s;
+let LOCK_INFO = null;
+
+/* 감싼 키들을 훑어 맞는 것을 찾습니다. salt 를 공유하므로 PBKDF2 는 딱 1회 돕니다. */
+async function findKey(kek, keys){
+  for(const k of keys){
+    try{
+      const plain = await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(k.iv)}, kek, b64(k.blob));
+      return JSON.parse(new TextDecoder().decode(plain));
+    }catch(_){}
+  }
+  throw new Error('BADPW');
+}
+/* 교사용으로 열면 그 주 학생 코드를 계산해 보여 줍니다.
+   마스터 시크릿은 교사용으로 감싼 안쪽에만 있어 학생 코드로는 계산할 수 없습니다. */
+async function weekCode(msB64, mon){
+  const k = await crypto.subtle.importKey('raw', b64(msB64), {name:'HMAC',hash:'SHA-256'}, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', k,
+    new TextEncoder().encode((LOCK_INFO.prefix||'HONGW|') + isoOf(mon))));
+  const n = ((sig[0]<<24)>>>0) + (sig[1]<<16) + (sig[2]<<8) + sig[3];
+  return String(n % 90000000 + 10000000);
+}
+
+async function unlockBank(pw, quiet){
+  const msg = $('#lockMsg');
+  const say = (t,c)=>{ if(!quiet || c==='bad'){ msg.innerHTML=t;
+    msg.style.color = c==='bad' ? 'var(--no)' : (c==='ok' ? 'var(--ok)' : 'var(--dim)'); } };
+  try{
+    say('여는 중…');
+    const blob = await (await fetch('bank.enc',{cache:'no-store'})).json();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    const kek = await crypto.subtle.deriveKey(
+      {name:'PBKDF2', salt:b64(blob.kdf.salt), iterations:blob.kdf.iter, hash:'SHA-256'},
+      base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+    const info = await findKey(kek, blob.keys);
+    const today = isoOf(new Date());
+    if(info.nbf && today < info.nbf){ const e=new Error('NOTYET'); e.when=info.nbf; throw e; }
+    if(info.exp && today >= info.exp){ const e=new Error('EXPIRED'); e.when=info.exp; throw e; }
+    LOCK_INFO = info;
+
+    const CK = await crypto.subtle.importKey('raw', b64(info.ck), {name:'AES-GCM'}, false, ['decrypt']);
+    const sealed = b64(blob.data);
+    const plain = new Uint8Array(await crypto.subtle.decrypt(
+      {name:'AES-GCM', iv:sealed.slice(0,12)}, CK, sealed.slice(12)));
+    const txt = await new Response(new Blob([plain]).stream()
+      .pipeThrough(new DecompressionStream('gzip'))).text();
+
+    const payload = JSON.parse(txt);
+    LEARN = payload.learn || [];
+    QUESTIONS = payload.questions || [];
+
+    try{
+      localStorage.setItem(LOCK_KEY, pw);
+      if(!info.exp) localStorage.setItem(SHARED_KEY, pw);   /* 만료되는 코드는 공용에 넣지 않습니다 */
+    }catch(e){}
+
+    let extra = '';
+    if(!quiet && info.role==='teacher' && info.ms){
+      const cd = await weekCode(info.ms, mondayOf(new Date()));
+      extra = '<br><b style="color:var(--pu)">이번 주 학생 코드 — ' + prettyCode(cd) + '</b>';
+    }
+    say('✅ 개념 '+LEARN.length+'개 · 문항 '+QUESTIONS.length+'개가 열렸어요!' + extra, 'ok');
+    boot();
+    setTimeout(()=>{ $('#lock').hidden = true; }, extra ? 2600 : 400);
+    return true;
+  }catch(e){
+    const m = e && e.message;
+    if(m==='EXPIRED')     say('사용 기간이 끝난 코드예요('+e.when+'까지). 선생님께 이번 주 코드를 받으세요.','bad');
+    else if(m==='NOTYET') say('아직 쓸 수 없는 코드예요. '+e.when+'부터 쓸 수 있어요.','bad');
+    else                  say('코드가 맞지 않아요.','bad');
+    try{ localStorage.removeItem(LOCK_KEY); }catch(_){}     /* 공용 키는 건드리지 않습니다 */
+    return false;
+  }
+}
+
+function boot(){
+  $('#app').hidden = false;
+  $('#hdSub').textContent = '개념 '+LEARN.length+' · 문항 '+QUESTIONS.length
+    + (window.FixOrder && FixOrder.on ? ' · 수업용 고정 순서' : '');
+  render('learn');
+}
+
+$('#lockGo').onclick = ()=> unlockBank($('#lockPw').value.replace(/\s+/g,''));
+$('#lockPw').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#lockGo').click(); });
+
+/* 문항 수 표시 + 이전에 열었으면 조용히 자동 해제 */
+fetch('bank.enc',{cache:'no-store'}).then(r=>r.json())
+  .then(b=>{ $('#lockN').textContent = '개념 '+(b.secs||0)+'개 · 문항 '+(b.n||0)+'개';
+             document.body.dataset.build = b.build || ''; })
+  .catch(()=>{ $('#lockN').textContent = '(준비 중)'; });
+
+(function(){
+  try{
+    const a = localStorage.getItem(LOCK_KEY), b = localStorage.getItem(SHARED_KEY), t = [];
+    if(a) t.push(a);
+    if(b && b!==a) t.push(b);
+    (function nextTry(i){
+      if(i>=t.length) return;
+      unlockBank(t[i], true).then(ok=>{ if(!ok) nextTry(i+1); });
+    })(0);
+  }catch(e){}
+})();
+</script>
+
+<!-- 공용 위젯 — 순서 그대로 두세요 (규약 1 · 3 · 3-1) -->
+<script src="https://hongyul67-cpu.github.io/links/collector.js"  data-tool="전자회로 마스터"></script>
+<script src="https://hongyul67-cpu.github.io/links/fx.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/rank.js"       data-tool="전자회로" data-pace="class"></script>
+<script src="https://hongyul67-cpu.github.io/links/class-mode.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/reset.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/backbar.js"></script>
+</body>
+</html>
