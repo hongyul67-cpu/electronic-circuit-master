@@ -116,6 +116,8 @@
     'body.bd-open .tr-btn,',        /* 기록 초기화 (reset.js) */
     'body.bd-open #rb-btn,',        /* 평가 기준 (collector.js) — ◀ 이전 단추 왼쪽을 덮어 못 누르게 하던 것 */
     'body.bd-open .fx-snd,',        /* 소리 켜기 (fx.js) — 다음 슬라이드 단추 밑에 깔려 쓸모가 없다 */
+    'body.bd-open .cm-launch,',    /* 수업모드 (class-mode.js) — z-index 가 21억이라 슬라이드(99000) 위에 뜬다.
+                                      「다음 슬라이드 ▶」 오른쪽 끝을 덮어 클릭을 가로챈다 (E3 세션이 찾음) */
     'body.bd-open #rk-badge{visibility:hidden!important;pointer-events:none!important}'   /* 계급 배지 (rank.js) */
   ].join('\n');
 

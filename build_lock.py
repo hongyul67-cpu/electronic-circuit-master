@@ -125,6 +125,8 @@ def main():
     if os.path.exists(fp):
         html = io.open(fp, encoding="utf-8").read()
         fixed = re.sub(r'(<body[^>]*data-build=")[^"]*(")', r'\g<1>' + build_id + r'\g<2>', html)
+        # board.js(전자칠판 엔진)도 캐시가 남으면 옛 버전이 뜬다. 같은 표식을 붙인다.
+        fixed = re.sub(r'(<script src="board\.js\?v=)[^"]*(")', r'\g<1>' + build_id + r'\g<2>', fixed)
         if fixed != html:
             io.open(fp, "w", encoding="utf-8", newline="").write(fixed)
 
