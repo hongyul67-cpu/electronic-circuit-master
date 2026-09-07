@@ -210,7 +210,7 @@ td.ycell.bad button{color:var(--no)}
 
   <div class="tabs">
     <button class="tab on" data-view="learn">📖 배우기</button>
-    <button class="tab"    data-view="board">📽️ 수업자료</button>
+    <button class="tab"    data-view="board">📽️ 수업 슬라이드</button>
     <button class="tab"    data-view="game">🎮 게임</button>
     <button class="tab"    data-view="practice">✏️ 연습 8문항</button>
     <button class="tab"    data-view="exam">🏁 종합시험 20문항</button>
@@ -699,17 +699,18 @@ function wave(kind){
     + '<polyline points="'+pts.join(' ')+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
 }
 
-/* ══════════════════ 📽️ 전자칠판 수업자료 ══════════════════
-   화면은 공용 board.js 가 맡고, 원고(LESSON)는 bank.enc 안에 있다.
+/* ══════════════════ 📽️ 수업 슬라이드 ══════════════════
+   화면은 links 의 공용 board-pro.js 가 맡고, 원고(LESSON)는 bank.enc 안에 있다.
    그림은 여기서 sym()·wave() 를 불러 그때그때 만든다 —
    암호문 안에 SVG 를 통째로 넣지 않아도 되고, 게임과 같은 그림을 쓴다. */
 function buildLesson(){
-  /* board.js 의 .bd-figsvg 는 배경이 흰색인데 sym()·wave() 는 currentColor 로 그린다.
-     슬라이드 레이어의 글자색이 밝은 색이라 그대로 두면 흰 바탕에 흰 선이 되어 안 보인다.
-     그래서 어두운 색을 입히고, 교실 대형 화면에 맞게 크게 키워서 넣는다.
-     (board.js 는 모든 도구가 함께 쓰는 파일이라 고치지 않는다) */
-  var WRAP = '<span style="display:block;color:#1c2430;text-align:center">'
-           + '<style>.bd-figsvg svg{width:100%;max-width:620px;height:auto}</style>';
+  /* board-pro.js 의 그림칸(.bp-fig)은 어두운 판이고, sym()·wave() 는 currentColor 로 그린다.
+     여기서 색을 정해 주지 않으면 본체 페이지의 어두운 글자색을 물려받아
+     어두운 판에 어두운 선이 되어 안 보인다. 그래서 밝은 색을 입힌다.
+     (v1 뷰어일 때는 반대로 흰 판이라 어두운 색을 입혔었다.)
+     board-pro.js 는 모든 도구가 함께 쓰는 파일이라 고치지 않는다. */
+  var WRAP = '<span style="display:block;color:#dbe7f5;text-align:center;'
+           + 'width:100%;max-width:660px;margin:0 auto">';
   return LESSON_RAW.map(function(s){
     var o = {}; for(var k in s) o[k] = s[k];
     var g = s.sym ? sym(s.sym) : (s.wv ? wave(s.wv) : null);
@@ -729,16 +730,39 @@ function renderBoard(v){
     return { name:u.name, idx:idx };
   }).filter(function(u){ return u.idx.length; });
 
-  var box = el('<div class="card"><h3 style="margin:0 0 6px">📽️ 수업자료 — 전자칠판</h3>'
+  var box = el('<div class="card"><h3 style="margin:0 0 6px">📽️ 수업 슬라이드</h3>'
     + '<p class="muted" style="margin:0 0 12px">교사가 앞에서 끌고 가는 화면입니다. '
-    + '단원을 고르면 전체 화면 슬라이드가 열립니다.</p>'
-    + '<div id="boardHome"></div></div>');
+    + '단원을 고르면 전체 화면 슬라이드가 열립니다. 슬라이드 '
+    + window.LESSON.length + '장 · 그림은 게임과 같은 SVG 를 씁니다.</p>'
+    + '<button class="btn btn-primary" id="boardGo" style="width:100%;padding:14px;font-size:16px">'
+    + '📽️ 수업 슬라이드 열기 (선생님용) →</button></div>');
   v.appendChild(box);
+  box.querySelector('#boardGo').onclick = openBoard;
+}
 
-  Board.home(box.querySelector('#boardHome'), {
-    hint:'넘기기 — <b>←</b> <b>→</b> 키(프레젠터 리모컨) 또는 화면 아래 [◀ 이전] [다음 ▶]<br>'
-       + '요점의 <b>빈칸</b>을 누르면 답이 드러납니다. 학생에게 먼저 물어보세요.<br>'
-       + '슬라이드 ' + window.LESSON.length + '장 · 그림은 게임과 같은 SVG 를 씁니다.'
+/* 화면은 links 의 공용 board-pro.js — 저장소에 사본을 두지 않는다 */
+function openBoard(){
+  if(!window.BoardPro || !(window.LESSON||[]).length){
+    alert('수업자료를 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.'); return;
+  }
+  var ALL = window.LESSON, U = window.UNITS || [];
+  var menu = U.map(function(u){
+    return { icon:'⚡', title:u.name,
+             desc:'슬라이드 ' + u.idx.length + '장',
+             run:{ kind:'lesson', deck:u.idx.map(function(i){ return ALL[i]; }) } };
+  });
+  menu.push({ icon:'📚', wide:true, title:'전체 이어서 (' + ALL.length + '장)',
+              desc:'Ⅰ단원부터 Ⅶ단원까지 순서대로 진행합니다.',
+              run:{ kind:'lesson', deck:ALL } });
+  menu.push({ icon:'⬜', wide:true, title:'빈 칠판',
+              desc:'슬라이드 없이 판서만. 회로도를 직접 그려 설명할 때.',
+              run:{ kind:'blank' } });
+
+  BoardPro.open({
+    title:'📽️ 전자회로 · 수업 슬라이드',
+    sub:'요점 → <b>발문</b> → 퀴즈 → 정답을 하나씩 엽니다. 화면 어디든 바로 판서됩니다.<br>'
+       + '요점 속 <b>파란 빈칸</b>은 눌러야 답이 보입니다.',
+    menu: menu
   });
 }
 
@@ -1170,11 +1194,11 @@ fetch('bank.enc',{cache:'no-store'}).then(r=>r.json())
 </script>
 
 <!-- 공용 위젯 — 순서 그대로 두세요 (규약 1 · 3 · 3-1) -->
-<script src="board.js?v=5e63683a"></script>
+<!-- 수업 슬라이드 화면 — links 의 공용 파일. 저장소에 사본을 두지 않는다 -->
+<script src="https://hongyul67-cpu.github.io/links/board-pro.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/collector.js"  data-tool="전자회로 마스터"></script>
 <script src="https://hongyul67-cpu.github.io/links/fx.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/rank.js"       data-tool="전자회로" data-pace="class"></script>
-<script src="https://hongyul67-cpu.github.io/links/class-mode.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/reset.js"></script>
 <script src="https://hongyul67-cpu.github.io/links/backbar.js"></script>
 </body>
