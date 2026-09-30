@@ -34,6 +34,9 @@ header .sub{color:var(--dim);font-size:13px}
 .card h3{margin:0 0 8px;font-size:16px}
 .card .body{color:#333}
 .card .body p{margin:8px 0}
+/* 배우기 그림 — figs.js 의 그림이 본문 속 자리(figslot)에 들어간다 */
+.card .body .figslot{margin:14px auto 16px;max-width:560px}
+.card .body .figslot:empty{display:none}
 .kw{background:#eef4ff;color:#1d4ed8;border-radius:6px;padding:1px 6px;font-weight:700}
 .tip{background:#f0f9f4;border-left:3px solid var(--ok);border-radius:0 8px 8px 0;padding:9px 12px}
 .warn{background:#fff7ed;border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:9px 12px}
@@ -144,7 +147,7 @@ td.ycell.bad button{color:var(--no)}
 }
 </style>
 </head>
-<body data-build="5e63683a">
+<body data-build="a14e793d">
 
 <!-- 게이트 기호 — 직접 그린 SVG (외부 이미지는 언젠가 깨집니다) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -220,6 +223,9 @@ td.ycell.bad button{color:var(--no)}
   <div id="view"></div>
 </div>
 
+<!-- 그림 — 그리는 도구(fig.js)는 links 의 공용 파일, 그림 모음(figs.js)은 이 저장소 것 -->
+<script src="https://hongyul67-cpu.github.io/links/fig.js"></script>
+<script src="figs.js"></script>
 <script>
 /* ══════════════════════════════════════════════════════════════
    전자회로 마스터
@@ -308,6 +314,8 @@ function renderLearn(v){
       const w = document.createElement('div'); w.className='tw';
       t.parentNode.insertBefore(w,t); w.appendChild(t);
     });
+    /* 본문 속 그림 자리(figslot)를 figs.js 의 그림으로 채운다 */
+    if(window.FIG) FIG.mount(c);
     const rd = el('<button class="btn'+(ST.read[s.t]?'':' btn-ghost')+'">'
       + (ST.read[s.t]?'✅ 읽었어요':'읽음으로 표시') + '</button>');
     rd.onclick = ()=>{ ST.read[s.t] = !ST.read[s.t]; save(); renderLearn(v); };
@@ -715,6 +723,8 @@ function buildLesson(){
     var o = {}; for(var k in s) o[k] = s[k];
     var g = s.sym ? sym(s.sym) : (s.wv ? wave(s.wv) : null);
     if(g) o.svg = WRAP + g + '</span>';
+    /* figs.js 그림 — 배우기와 같은 그림. 빈칸·퀴즈 답이 되는 글자는 ? 로 가린다 */
+    else if(s.fig && window.FIG && FIG.has(s.fig)) o.svg = FIG.svgOf(s.fig, {labels:false});
     return o;
   });
 }
